@@ -36,9 +36,16 @@ static int sq(char f, char r) {
 }
 
 #define SIDE -1
-#define DEPTH 5
+
+#ifdef GAMEBOY
+#define ALPHA -10000
+#define BETA 10000
+#define DEPTH 3
+#else
 #define ALPHA -30000
 #define BETA 30000
+#define DEPTH 5
+#endif
 
 uint8_t joypad_previous, joypad_current;
 uint8_t input_index = 0;

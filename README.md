@@ -1,6 +1,6 @@
 This is a GBDK version of sameshi https://github.com/datavorous/sameshi chess engine for GBDK. 
 
-* The sameshi.h file is has not been modified and compile as-is with GBDK toolchain. 
+* The sameshi.h compile as-is with GBDK toolchain. unsing the readable version, the stack has been lowered 
 
 * Use GBDK text example as base. 
 

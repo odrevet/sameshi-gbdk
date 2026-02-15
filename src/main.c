@@ -61,9 +61,10 @@ void main(void) {
 
   DISPLAY_ON;
   joypad_previous, joypad_current = 0;
+  
   board();
-  printf("%s\n", m);
-  printf("^\n");
+  print_input();
+
   while (1) {
     joypad_previous = joypad_current;
     joypad_current = joypad();
@@ -82,6 +83,7 @@ void main(void) {
       board();
       print_input();
     }
+
     if (joypad_current & J_UP && !(joypad_previous & J_UP)) {
       if (input_index % 2 == 0) {
         if (m[input_index] < 'a' || m[input_index] >= 'h')
@@ -96,6 +98,7 @@ void main(void) {
       }
       print_input();
     }
+
     if (joypad_current & J_DOWN && !(joypad_previous & J_DOWN)) {
       if (input_index % 2 == 0) {
         if (m[input_index] <= 'a' || m[input_index] > 'h')
@@ -110,6 +113,7 @@ void main(void) {
       }
       print_input();
     }
+
     if (joypad_current & J_LEFT && !(joypad_previous & J_LEFT) &&
         input_index > 0) {
       input_index--;
@@ -118,15 +122,18 @@ void main(void) {
         printf(" ");
       printf("^\n");
     }
+
     if (joypad_current & J_RIGHT && !(joypad_previous & J_RIGHT) &&
         input_index < 3) {
       input_index++;
       print_input();
     }
+
     if (joypad_current & J_B && !(joypad_previous & J_B)) {
       board();
       print_input();
     }
+
     wait_vbl_done();
   }
 }

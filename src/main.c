@@ -124,10 +124,7 @@ void main(void) {
     if (joypad_current & J_LEFT && !(joypad_previous & J_LEFT) &&
         input_index > 0) {
       input_index--;
-      printf("%s\n", m);
-      for (int i = 0; i < input_index; i++)
-        printf(" ");
-      printf("^\n");
+      print_input();
     }
 
     if (joypad_current & J_RIGHT && !(joypad_previous & J_RIGHT) &&

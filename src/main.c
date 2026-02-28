@@ -1,5 +1,6 @@
-#include <gb/gb.h>
-#include <gb/metasprites.h>
+#include <gbdk/platform.h>
+#include <gbdk/metasprites.h>
+
 #include <stdio.h>
 
 #include "sameshi.h"
@@ -8,8 +9,6 @@
 #include <Font.h>
 #include <Hand.h>
 #include <Pieces.h>
-
-#include <gbdk/emu_debug.h>
 
 extern int b[120], bs, bd;
 uint8_t input_index = 0;

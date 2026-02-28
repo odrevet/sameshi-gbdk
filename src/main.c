@@ -30,11 +30,8 @@ char m[8] = {'a', '1', 'a', '1', 0, 0, 0, 0};
 #define BOARD_SPRITE_ORIGIN_X 22
 #define BOARD_SPRITE_ORIGIN_Y 30
 
-#define BOARD_SPRITE_MAX_X (BOARD_SPRITE_ORIGIN_X + 7 * PX_PER_SQUARE)
-#define BOARD_SPRITE_MAX_Y (BOARD_SPRITE_ORIGIN_Y + 7 * PX_PER_SQUARE)
-
-uint8_t cursor_x = 4 * PX_PER_SQUARE + BOARD_SPRITE_ORIGIN_X;
-uint8_t cursor_y = 7 * PX_PER_SQUARE + BOARD_SPRITE_ORIGIN_Y;
+uint8_t cursor_x = 4;
+uint8_t cursor_y = 7;
 
 uint8_t joypad_previous = 0;
 uint8_t joypad_current = 0;
@@ -87,15 +84,11 @@ void clear_screen(void) {
 }
 
 static char cursor_file(void) {
-  uint8_t col = (cursor_x - BOARD_SPRITE_ORIGIN_X) / PX_PER_SQUARE;
-  if (col > 7) col = 7;
-  return 'a' + col;
+  return 'a' + cursor_x;
 }
 
 static char cursor_rank(void) {
-  uint8_t row = (cursor_y - BOARD_SPRITE_ORIGIN_Y) / PX_PER_SQUARE;
-  if (row > 7) row = 7;
-  return '8' - row;
+  return '8' - cursor_y;
 }
 
 static int alg_to_sq(char file, char rank) {
@@ -195,7 +188,8 @@ void main(void) {
 
   while (1) {
     move_metasprite_ex(Hand_metasprites[grabbing], Hand_TILE_ORIGIN, 0, 0,
-                       cursor_x, cursor_y);
+                       BOARD_SPRITE_ORIGIN_X + cursor_x * PX_PER_SQUARE,
+                       BOARD_SPRITE_ORIGIN_Y + cursor_y * PX_PER_SQUARE);
 
     joypad_previous = joypad_current;
     joypad_current = joypad();
@@ -203,16 +197,16 @@ void main(void) {
     uint8_t moved = 0;
 
     if (joypad_current & J_UP && !(joypad_previous & J_UP)) {
-      if (cursor_y > BOARD_SPRITE_ORIGIN_Y) { cursor_y -= PX_PER_SQUARE; moved = 1; }
+      if (cursor_y > 0) { cursor_y--; moved = 1; }
     }
     if (joypad_current & J_DOWN && !(joypad_previous & J_DOWN)) {
-      if (cursor_y < BOARD_SPRITE_MAX_Y) { cursor_y += PX_PER_SQUARE; moved = 1; }
+      if (cursor_y < 7) { cursor_y++; moved = 1; }
     }
     if (joypad_current & J_LEFT && !(joypad_previous & J_LEFT)) {
-      if (cursor_x > BOARD_SPRITE_ORIGIN_X) { cursor_x -= PX_PER_SQUARE; moved = 1; }
+      if (cursor_x > 0) { cursor_x--; moved = 1; }
     }
     if (joypad_current & J_RIGHT && !(joypad_previous & J_RIGHT)) {
-      if (cursor_x < BOARD_SPRITE_MAX_X) { cursor_x += PX_PER_SQUARE; moved = 1; }
+      if (cursor_x < 7) { cursor_x++; moved = 1; }
     }
 
     // Redraw whenever the cursor moves while grabbing so the preview updates

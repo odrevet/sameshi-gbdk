@@ -30,7 +30,6 @@ char m[8] = {'a', '1', 'a', '1', 0, 0, 0, 0};
 #define BOARD_SPRITE_ORIGIN_X 22
 #define BOARD_SPRITE_ORIGIN_Y 30
 
-// Last valid sprite coord on the board (7 squares * 16px from origin)
 #define BOARD_SPRITE_MAX_X (BOARD_SPRITE_ORIGIN_X + 7 * PX_PER_SQUARE)
 #define BOARD_SPRITE_MAX_Y (BOARD_SPRITE_ORIGIN_Y + 7 * PX_PER_SQUARE)
 
@@ -41,6 +40,8 @@ uint8_t joypad_previous = 0;
 uint8_t joypad_current = 0;
 
 uint8_t grabbing = 0;
+int grabbed_piece = 0;
+uint8_t grabbed_sq = 0;
 
 const uint8_t king_black_on_white_tiles[4] = {0, 1, 12, 13};
 const uint8_t queen_black_on_white_tiles[4] = {2, 3, 14, 15};
@@ -87,15 +88,13 @@ void clear_screen(void) {
 
 static char cursor_file(void) {
   uint8_t col = (cursor_x - BOARD_SPRITE_ORIGIN_X) / PX_PER_SQUARE;
-  if (col > 7)
-    col = 7;
+  if (col > 7) col = 7;
   return 'a' + col;
 }
 
 static char cursor_rank(void) {
   uint8_t row = (cursor_y - BOARD_SPRITE_ORIGIN_Y) / PX_PER_SQUARE;
-  if (row > 7)
-    row = 7;
+  if (row > 7) row = 7;
   return '8' - row;
 }
 
@@ -103,10 +102,24 @@ static int alg_to_sq(char file, char rank) {
   return (rank - '0' + 1) * 10 + (file - 'a' + 1);
 }
 
+// Draw the board. If grabbing, the source square is shown empty and the
+// grabbed piece is shown at the current cursor square as a preview.
 void draw_board(void) {
+  uint8_t preview_sq = grabbing ? alg_to_sq(cursor_file(), cursor_rank()) : 0;
+
   for (uint8_t row = 0; row < 8; row++) {
     for (uint8_t col = 0; col < 8; col++) {
-      int sq_val = b[(9 - row) * 10 + (col + 1)];
+      uint8_t sq = (9 - row) * 10 + (col + 1);
+      int sq_val = b[sq];
+
+      // Hide piece from its origin square while dragging
+      if (grabbing && sq == grabbed_sq)
+        sq_val = 0;
+
+      // Show grabbed piece at the cursor square
+      if (grabbing && sq == preview_sq)
+        sq_val = grabbed_piece;
+
       int piece_type = j(sq_val);
       uint8_t tx = col * PIECE_SIZE_IN_TILES;
       uint8_t ty = row * PIECE_SIZE_IN_TILES;
@@ -120,89 +133,41 @@ void draw_board(void) {
       } else if (is_white_piece) {
         if (is_white_square) {
           switch (piece_type) {
-          case 6:
-            tiles = king_white_on_white_tiles;
-            break;
-          case 5:
-            tiles = queen_white_on_white_tiles;
-            break;
-          case 3:
-            tiles = bishop_white_on_white_tiles;
-            break;
-          case 2:
-            tiles = knight_white_on_white_tiles;
-            break;
-          case 4:
-            tiles = rook_white_on_white_tiles;
-            break;
-          case 1:
-            tiles = pawn_white_on_white_tiles;
-            break;
+          case 6: tiles = king_white_on_white_tiles;   break;
+          case 5: tiles = queen_white_on_white_tiles;  break;
+          case 3: tiles = bishop_white_on_white_tiles; break;
+          case 2: tiles = knight_white_on_white_tiles; break;
+          case 4: tiles = rook_white_on_white_tiles;   break;
+          case 1: tiles = pawn_white_on_white_tiles;   break;
           }
         } else {
           switch (piece_type) {
-          case 6:
-            tiles = king_white_on_black_tiles;
-            break;
-          case 5:
-            tiles = queen_white_on_black_tiles;
-            break;
-          case 3:
-            tiles = bishop_white_on_black_tiles;
-            break;
-          case 2:
-            tiles = knight_white_on_black_tiles;
-            break;
-          case 4:
-            tiles = rook_white_on_black_tiles;
-            break;
-          case 1:
-            tiles = pawn_white_on_black_tiles;
-            break;
+          case 6: tiles = king_white_on_black_tiles;   break;
+          case 5: tiles = queen_white_on_black_tiles;  break;
+          case 3: tiles = bishop_white_on_black_tiles; break;
+          case 2: tiles = knight_white_on_black_tiles; break;
+          case 4: tiles = rook_white_on_black_tiles;   break;
+          case 1: tiles = pawn_white_on_black_tiles;   break;
           }
         }
       } else {
         if (is_white_square) {
           switch (piece_type) {
-          case 6:
-            tiles = king_black_on_white_tiles;
-            break;
-          case 5:
-            tiles = queen_black_on_white_tiles;
-            break;
-          case 3:
-            tiles = bishop_black_on_white_tiles;
-            break;
-          case 2:
-            tiles = knight_black_on_white_tiles;
-            break;
-          case 4:
-            tiles = rook_black_on_white_tiles;
-            break;
-          case 1:
-            tiles = pawn_black_on_white_tiles;
-            break;
+          case 6: tiles = king_black_on_white_tiles;   break;
+          case 5: tiles = queen_black_on_white_tiles;  break;
+          case 3: tiles = bishop_black_on_white_tiles; break;
+          case 2: tiles = knight_black_on_white_tiles; break;
+          case 4: tiles = rook_black_on_white_tiles;   break;
+          case 1: tiles = pawn_black_on_white_tiles;   break;
           }
         } else {
           switch (piece_type) {
-          case 6:
-            tiles = king_black_on_black_tiles;
-            break;
-          case 5:
-            tiles = queen_black_on_black_tiles;
-            break;
-          case 3:
-            tiles = bishop_black_on_black_tiles;
-            break;
-          case 2:
-            tiles = knight_black_on_black_tiles;
-            break;
-          case 4:
-            tiles = rook_black_on_black_tiles;
-            break;
-          case 1:
-            tiles = pawn_black_on_black_tiles;
-            break;
+          case 6: tiles = king_black_on_black_tiles;   break;
+          case 5: tiles = queen_black_on_black_tiles;  break;
+          case 3: tiles = bishop_black_on_black_tiles; break;
+          case 2: tiles = knight_black_on_black_tiles; break;
+          case 4: tiles = rook_black_on_black_tiles;   break;
+          case 1: tiles = pawn_black_on_black_tiles;   break;
           }
         }
       }
@@ -235,40 +200,44 @@ void main(void) {
     joypad_previous = joypad_current;
     joypad_current = joypad();
 
+    uint8_t moved = 0;
+
     if (joypad_current & J_UP && !(joypad_previous & J_UP)) {
-      if (cursor_y > BOARD_SPRITE_ORIGIN_Y)
-        cursor_y -= PX_PER_SQUARE;
+      if (cursor_y > BOARD_SPRITE_ORIGIN_Y) { cursor_y -= PX_PER_SQUARE; moved = 1; }
     }
     if (joypad_current & J_DOWN && !(joypad_previous & J_DOWN)) {
-      if (cursor_y < BOARD_SPRITE_MAX_Y)
-        cursor_y += PX_PER_SQUARE;
+      if (cursor_y < BOARD_SPRITE_MAX_Y) { cursor_y += PX_PER_SQUARE; moved = 1; }
     }
     if (joypad_current & J_LEFT && !(joypad_previous & J_LEFT)) {
-      if (cursor_x > BOARD_SPRITE_ORIGIN_X)
-        cursor_x -= PX_PER_SQUARE;
+      if (cursor_x > BOARD_SPRITE_ORIGIN_X) { cursor_x -= PX_PER_SQUARE; moved = 1; }
     }
     if (joypad_current & J_RIGHT && !(joypad_previous & J_RIGHT)) {
-      if (cursor_x < BOARD_SPRITE_MAX_X)
-        cursor_x += PX_PER_SQUARE;
+      if (cursor_x < BOARD_SPRITE_MAX_X) { cursor_x += PX_PER_SQUARE; moved = 1; }
     }
 
-if (joypad_current & J_B && !(joypad_previous & J_B)) {
+    // Redraw whenever the cursor moves while grabbing so the preview updates
+    if (grabbing && moved) {
+      draw_board();
+    }
+
+    if (joypad_current & J_B && !(joypad_previous & J_B)) {
       if (!grabbing) {
-        // ignore if empty or piece is not on player side
-        uint8_t grab_sq = alg_to_sq(cursor_file(), cursor_rank());
-        if (b[grab_sq] > 0) {
+        grabbed_sq = alg_to_sq(cursor_file(), cursor_rank());
+        if (b[grabbed_sq] > 0) {
           m[0] = cursor_file();
           m[1] = cursor_rank();
+          grabbed_piece = b[grabbed_sq];
           grabbing = 1;
+          draw_board();
         }
       } else {
         m[2] = cursor_file();
         m[3] = cursor_rank();
         grabbing = 0;
+        grabbed_piece = 0;
 
-        // Cancel move if destination is same as source
         if (m[2] == m[0] && m[3] == m[1]) {
-          // Drop piece in place, no move made
+          draw_board(); // restore board with piece back in place
         } else {
           s = alg_to_sq(m[0], m[1]);
           d = alg_to_sq(m[2], m[3]);
@@ -292,6 +261,8 @@ if (joypad_current & J_B && !(joypad_previous & J_B)) {
     if (joypad_current & J_A && !(joypad_previous & J_A)) {
       if (grabbing) {
         grabbing = 0;
+        grabbed_piece = 0;
+        draw_board(); // restore piece to origin square
       }
     }
 

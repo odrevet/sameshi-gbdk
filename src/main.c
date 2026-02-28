@@ -42,8 +42,8 @@ char m[8] = {'a', '1', 'a', '1', 0, 0, 0, 0};
 #define BOARD_SPRITE_MAX_X (BOARD_SPRITE_ORIGIN_X + 7 * PX_PER_SQUARE)
 #define BOARD_SPRITE_MAX_Y (BOARD_SPRITE_ORIGIN_Y + 7 * PX_PER_SQUARE)
 
-uint8_t cursor_x = BOARD_SPRITE_ORIGIN_X;
-uint8_t cursor_y = BOARD_SPRITE_ORIGIN_Y;
+uint8_t cursor_x = 4 * PX_PER_SQUARE + BOARD_SPRITE_ORIGIN_X;
+uint8_t cursor_y = 7 * PX_PER_SQUARE + BOARD_SPRITE_ORIGIN_Y;
 
 uint8_t joypad_previous = 0;
 uint8_t joypad_current = 0;

@@ -27,8 +27,19 @@ char m[8] = {'a', '1', 'a', '1', 0, 0, 0, 0};
 #define PIECE_SIZE_IN_TILES 2
 #define PX_PER_SQUARE 16
 
-#define BOARD_SPRITE_ORIGIN_X 22
-#define BOARD_SPRITE_ORIGIN_Y 30
+#define BOARD_DRAW_X 1
+#define BOARD_DRAW_Y 1
+
+#ifdef GAMEBOY
+#define HAND_OFFSET_X 24
+#define HAND_OFFSET_Y 32
+#elif defined(NINTENDO_NES)
+#define HAND_OFFSET_X 16
+#define HAND_OFFSET_Y 14
+#else
+#define HAND_OFFSET_X 0
+#define HAND_OFFSET_Y 0
+#endif
 
 uint8_t cursor_x = 4;
 uint8_t cursor_y = 7;
@@ -114,8 +125,8 @@ void draw_board(void) {
         sq_val = grabbed_piece;
 
       int piece_type = j(sq_val);
-      uint8_t tx = col * PIECE_SIZE_IN_TILES;
-      uint8_t ty = row * PIECE_SIZE_IN_TILES;
+      uint8_t tx = BOARD_DRAW_X + col * PIECE_SIZE_IN_TILES;
+      uint8_t ty = BOARD_DRAW_Y + row * PIECE_SIZE_IN_TILES;
       uint8_t is_white_piece = (sq_val > 0);
       uint8_t is_white_square = !((row + col) & 1);
 
@@ -188,9 +199,8 @@ void main(void) {
 
   while (1) {
     move_metasprite_ex(Hand_metasprites[grabbing], Hand_TILE_ORIGIN, 0, 0,
-                       BOARD_SPRITE_ORIGIN_X + cursor_x * PX_PER_SQUARE,
-                       BOARD_SPRITE_ORIGIN_Y + cursor_y * PX_PER_SQUARE);
-
+                       BOARD_DRAW_X * 8 + cursor_x * PX_PER_SQUARE + HAND_OFFSET_X,
+                       BOARD_DRAW_Y * 8 + cursor_y * PX_PER_SQUARE + HAND_OFFSET_Y);
     joypad_previous = joypad_current;
     joypad_current = joypad();
 

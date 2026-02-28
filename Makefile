@@ -84,7 +84,10 @@ $(OBJDIR)/%.s:	$(SRCDIR)/%.c
 
 
 png2asset:
-	$(PNG2ASSET) $(RESDIR)/Font.png  $(PNG2ASSET_BKG_SETTINGS_$(EXT)) -c $(GENDIR)/Font.c -map -keep_palette_order  -noflip
+	$(PNG2ASSET) $(RESDIR)/Font.png  $(PNG2ASSET_BKG_SETTINGS_$(EXT)) -c $(GENDIR)/Font.c -map -keep_palette_order -noflip
+	$(PNG2ASSET) $(RESDIR)/Pieces.png  $(PNG2ASSET_BKG_SETTINGS_$(EXT)) -c $(GENDIR)/Pieces.c -map -keep_palette_order -noflip
+	$(PNG2ASSET) $(RESDIR)/Background.png  $(PNG2ASSET_BKG_SETTINGS_$(EXT)) -c $(GENDIR)/Background.c -map -keep_palette_order -noflip -tile_origin 352
+	$(PNG2ASSET) $(RESDIR)/Hand.png -sw 16 -sh 16 -spr8x16 -c $(GENDIR)/Hand.c -keep_palette_order -noflip
 
 
 # Link the compiled object files into a .gb ROM file

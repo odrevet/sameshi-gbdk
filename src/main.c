@@ -111,16 +111,25 @@ static int alg_to_sq(char file, char rank) {
 void draw_board(void) {
   uint8_t preview_sq = grabbing ? alg_to_sq(cursor_file(), cursor_rank()) : 0;
 
+  // Draw file labels (a-h) across the top row
+  for (uint8_t index = 0; index < 8; index++) {
+    uint8_t tile = Font_TILE_ORIGIN + 1 + index;
+    set_bkg_tiles(BOARD_DRAW_X + index * PIECE_SIZE_IN_TILES, 0, 1, 1, &tile);
+  }
+
+  // Draw rank labels (8-1) down the left column
+  for (uint8_t index = 0; index < 8; index++) {
+    uint8_t tile = Font_TILE_ORIGIN + 28 + index;
+    set_bkg_tiles(0, BOARD_DRAW_Y + index * PIECE_SIZE_IN_TILES, 1, 1, &tile);
+  }
+
   for (uint8_t row = 0; row < 8; row++) {
     for (uint8_t col = 0; col < 8; col++) {
       uint8_t sq = (9 - row) * 10 + (col + 1);
       int sq_val = b[sq];
 
-      // Hide piece from its origin square while dragging
       if (grabbing && sq == grabbed_sq)
         sq_val = 0;
-
-      // Show grabbed piece at the cursor square
       if (grabbing && sq == preview_sq)
         sq_val = grabbed_piece;
 
@@ -193,6 +202,7 @@ void main(void) {
   set_sprite_data(Hand_TILE_ORIGIN, Hand_TILE_COUNT, Hand_tiles);
   set_bkg_data(Pieces_TILE_ORIGIN, Pieces_TILE_COUNT, Pieces_tiles);
   set_bkg_data(Background_TILE_ORIGIN, Background_TILE_COUNT, Background_tiles);
+  set_bkg_data(Font_TILE_ORIGIN, Font_TILE_COUNT, Font_tiles);
 
   clear_screen();
   draw_board();

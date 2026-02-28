@@ -20,20 +20,12 @@ int8_t d;
 char m[8] = {'a', '1', 'a', '1', 0, 0, 0, 0};
 
 #define SIDE -1
-#ifdef GAMEBOY
+#define DEPTH 3
 #define ALPHA -10000
 #define BETA 10000
-#define DEPTH 3
-#else
-#define ALPHA -30000
-#define BETA 30000
-#endif
 
 #define PIECE_SIZE_IN_TILES 2
 #define PX_PER_SQUARE 16
-
-#define DEVICE_SPRITE_PX_OFFSET_X 8
-#define DEVICE_SPRITE_PX_OFFSET_Y 16
 
 #define BOARD_SPRITE_ORIGIN_X 22
 #define BOARD_SPRITE_ORIGIN_Y 30

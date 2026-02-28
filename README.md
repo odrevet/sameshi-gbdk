@@ -10,3 +10,8 @@ Graphics from:
 
 * Hand: https://aspecsgaming.itch.io/cursor-hands
 
+# build
+
+```sh
+make -f Makefile.targets gb
+```

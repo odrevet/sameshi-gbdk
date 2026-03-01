@@ -119,8 +119,8 @@ void draw_board(void) {
 
   // Draw rank labels (8-1) down the left column
   for (uint8_t index = 0; index < 8; index++) {
-    uint8_t tile = Font_TILE_ORIGIN + 28 + index;
-    set_bkg_tiles(0, BOARD_DRAW_Y + index * PIECE_SIZE_IN_TILES, 1, 1, &tile);
+      uint8_t tile = Font_TILE_ORIGIN + 28 + (7 - index);
+      set_bkg_tiles(0, BOARD_DRAW_Y + index * PIECE_SIZE_IN_TILES, 1, 1, &tile);
   }
 
   for (uint8_t row = 0; row < 8; row++) {

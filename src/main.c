@@ -199,10 +199,17 @@ void main(void) {
   SHOW_SPRITES;
   SHOW_BKG;
 
+  #ifdef SEGA
+  set_sprite_native_data(Hand_TILE_ORIGIN, Hand_TILE_COUNT, Hand_tiles);
+  set_bkg_native_data(Pieces_TILE_ORIGIN, Pieces_TILE_COUNT, Pieces_tiles);
+  set_bkg_native_data(Background_TILE_ORIGIN, Background_TILE_COUNT, Background_tiles);
+  set_bkg_native_data(Font_TILE_ORIGIN, Font_TILE_COUNT, Font_tiles);
+  #else
   set_sprite_data(Hand_TILE_ORIGIN, Hand_TILE_COUNT, Hand_tiles);
   set_bkg_data(Pieces_TILE_ORIGIN, Pieces_TILE_COUNT, Pieces_tiles);
   set_bkg_data(Background_TILE_ORIGIN, Background_TILE_COUNT, Background_tiles);
   set_bkg_data(Font_TILE_ORIGIN, Font_TILE_COUNT, Font_tiles);
+  #endif
 
   clear_screen();
   draw_board();

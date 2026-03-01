@@ -14,8 +14,8 @@ extern int b[120], bs, bd;
 uint8_t input_index = 0;
 uint8_t player_turn = 0;
 
-int8_t s;
-int8_t d;
+int8_t player_from;
+int8_t player_to;
 
 char m[8] = {'a', '1', 'a', '1', 0, 0, 0, 0};
 
@@ -260,11 +260,11 @@ void main(void) {
         if (m[2] == m[0] && m[3] == m[1]) {
           draw_board(); // restore board with piece back in place
         } else {
-          s = alg_to_sq(m[0], m[1]);
-          d = alg_to_sq(m[2], m[3]);
+          player_from = alg_to_sq(m[0], m[1]);
+          player_to   = alg_to_sq(m[2], m[3]);
 
-          b[d] = b[s];
-          b[s] = 0;
+          b[player_to] = b[player_from];
+          b[player_from] = 0;
 
           draw_board();
 
